@@ -64,7 +64,7 @@ function onUpdate(dc as Dc) as Void {
         hours = hours.format("%02d");
     }
     var timeString = Lang.format(timeFormat, [hours, clockTime.min.format("%02d")]);
-    var timeStamp= new Time.Moment(Time.today().value());
+    //var timeStamp= new Time.Moment(Time.today().value());
     var weekdayArray = ["Day", "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"] as Array<String>;
     var monthArray = ["Month", "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"] as Array<String>;
    
@@ -135,8 +135,8 @@ function onUpdate(dc as Dc) as Void {
     }
         
     /*----------Steps------------------------------*/
-    var userSTEPS = 0;
-  if (info.steps != null){userSTEPS = info.steps.toNumber();}else{userSTEPS=0;} 
+    var userSTEPS = 360*3;
+  //if (info.steps != null){userSTEPS = info.steps.toNumber();}else{userSTEPS=0;} 
     var userCAL = 0;
     if (info.calories != null){userCAL = info.calories.toNumber();}else{userCAL=0;}  
    
@@ -162,7 +162,7 @@ function onUpdate(dc as Dc) as Void {
     } else {
         cond = 0; // Default to sun condition if unavailable
     }
-
+/*
     var positions;
     if (getCC != null && getCC.observationLocationPosition != null) {
         positions = getCC.observationLocationPosition;
@@ -173,6 +173,7 @@ function onUpdate(dc as Dc) as Void {
             :format => :degrees
         });
     }
+    */
     //Default set to Southern California 
 
     /*----------------Sunrise Sunset-------------------*/
@@ -289,16 +290,26 @@ dc.fillCircle(105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) *
     */
     //Draw Circle
     dc.setColor(0x91A174, Graphics.COLOR_TRANSPARENT);
-    dc.fillCircle(centerX,-45*screenHeightY,240*screenHeightY);
+    if (System.getDeviceSettings().screenHeight >400){
+         dc.fillCircle(centerX,-53*screenHeightY,240*screenHeightY);
+    }else{
+    dc.fillCircle(centerX,-45*screenHeightY,240*screenHeightY);}
     dc.setColor(0x7B8863, Graphics.COLOR_TRANSPARENT);
-    dc.fillCircle(centerX,-92*screenHeightY,240*screenHeightY);
+    if (System.getDeviceSettings().screenHeight >360){
+         dc.fillCircle(centerX,-92*screenWidthX,230*screenHeightY);
+    }else{
+    dc.fillCircle(centerX,-92*screenWidthX,240);}
     dc.setColor(0x4D6A5D, Graphics.COLOR_TRANSPARENT);       
     dc.setPenWidth(5);
+    if (System.getDeviceSettings().screenHeight >400){
+    dc.drawCircle(centerX,-53*screenHeightY,240*screenHeightY);
+    dc.setColor(0x98BD63, Graphics.COLOR_TRANSPARENT);       
+    dc.drawArc(centerX,-53*screenHeightY,240*screenHeightY, Graphics.ARC_COUNTER_CLOCKWISE, 225, 227+(((userSTEPS)%360)/4));
+    } else{
     dc.drawCircle(centerX,-45*screenHeightY,240*screenHeightY);
-    dc.setColor(0xDEDE18, Graphics.COLOR_TRANSPARENT);       
-    dc.setPenWidth(5);
+    dc.setColor(0x98BD63, Graphics.COLOR_TRANSPARENT);       
     dc.drawArc(centerX,-45*screenHeightY,240*screenHeightY, Graphics.ARC_COUNTER_CLOCKWISE, 225, 227+(((userSTEPS)%360)/4));
-   
+    }
    //Draw Moon and Battery
     moon1.draw(dc);
 
@@ -308,7 +319,25 @@ dc.fillCircle(105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) *
     dc.drawText( centerX,0*screenHeightY, bigFont, weather(cond), Graphics.TEXT_JUSTIFY_CENTER );
     dc.drawText(centerX,78*screenHeightY,wordFont,(weekdayArray[today.day_of_week]+" , "+ monthArray[today.month]+" "+ today.day +" " +today.year), Graphics.TEXT_JUSTIFY_CENTER );
     dc.drawText(centerX,73*screenHeightY,bigFont,timeString,  Graphics.TEXT_JUSTIFY_CENTER  ); 
-    
+    if (System.getDeviceSettings().screenHeight >400){
+        dc.setColor(0x18291E, Graphics.COLOR_TRANSPARENT);
+   // dc.setColor(0x396D4A, Graphics.COLOR_TRANSPARENT);
+    dc.drawText(50 *screenWidthX, 110*screenHeightY-10, funFont,"_" , Graphics.TEXT_JUSTIFY_CENTER);
+    dc.drawText(50*screenWidthX,135*screenHeightY-10,wordFont, userNotify , Graphics.TEXT_JUSTIFY_CENTER  ); 
+    dc.setColor(0x253E2D, Graphics.COLOR_TRANSPARENT);
+    //dc.setColor(0x365D43, Graphics.COLOR_TRANSPARENT);
+    dc.drawText( 105 *screenWidthX,134*screenHeightY -10, funFont,  ("^"), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText( 105 *screenWidthX,162*screenHeightY-10 , wordFont,  userHEART, Graphics.TEXT_JUSTIFY_CENTER );
+    dc.setColor(0x2A4D36, Graphics.COLOR_TRANSPARENT);
+    dc.drawText( centerX, (148)*screenHeightY-10, funFont,  ("$"), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText( centerX, (176)*screenHeightY-10, wordFont,  (userSTEPS), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.setColor(0x253E2D, Graphics.COLOR_TRANSPARENT);
+    dc.drawText( 255*screenWidthX,134*screenHeightY -10, funFont, "!", Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText( 255*screenWidthX,162*screenHeightY-10 , wordFont, userCAL, Graphics.TEXT_JUSTIFY_CENTER );
+    dc.setColor(0x18291E, Graphics.COLOR_TRANSPARENT);
+    dc.drawText(310 *screenWidthX,112*screenHeightY-10,funFont, ">",  Graphics.TEXT_JUSTIFY_CENTER  ); 
+    dc.drawText(310 *screenWidthX,135*screenHeightY-10,wordFont, userAlarm,  Graphics.TEXT_JUSTIFY_CENTER  ); 
+    }else{    
     //Draw Data Font
     dc.setColor(0x18291E, Graphics.COLOR_TRANSPARENT);
    // dc.setColor(0x396D4A, Graphics.COLOR_TRANSPARENT);
@@ -327,7 +356,7 @@ dc.fillCircle(105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) *
     dc.setColor(0x18291E, Graphics.COLOR_TRANSPARENT);
     dc.drawText(310 *screenWidthX,112*screenHeightY,funFont, ">",  Graphics.TEXT_JUSTIFY_CENTER  ); 
     dc.drawText(310 *screenWidthX,135*screenHeightY,wordFont, userAlarm,  Graphics.TEXT_JUSTIFY_CENTER  ); 
-
+    }
 
     /*---------------Draw Battery---------------*/
     dc.setColor(0x17231B, Graphics.COLOR_TRANSPARENT);  
@@ -388,11 +417,14 @@ function dogPhase(seconds, steps){
   else{venus2Y = 200;
   venus2X = screenWidthX - (seconds%20)*40;
   }
+
+  
     //Size Variations Pixel Circle
     //360 VenuS2 - The Model I designed it for 
     //390 Size up
     //416 Size up
     //454 Size up
+   /* 
   if (screenHeightY == 390){
    venus2Y = (200*screenHeightY/360);
   }
@@ -403,7 +435,12 @@ function dogPhase(seconds, steps){
       if (screenHeightY == 454){
    venus2Y = (220*screenHeightY/360);
    venus2X = 130*screenWidthX/360;
-  }
+  }*/
+
+    if (screenHeightY > 400){
+   venus2Y = venus2Y+30;
+   venus2X = venus2X;}
+
   var dogARRAY = [
    (new WatchUi.Bitmap({
     :rezId=>Rez.Drawables.dog0,
@@ -899,15 +936,21 @@ function dogPhase(seconds, steps){
 //DrawOpacityGraphic - dog -
 function waterPhase(seconds){
   var screenHeightY = System.getDeviceSettings().screenHeight;
-  var screenWidthX = System.getDeviceSettings().screenWidth;
+  //var screenWidthX = System.getDeviceSettings().screenWidth;
   var venus2X = 0-(seconds);
  // var venus2Y = 15;
   var venus2Y = 10;
+
+      if (screenHeightY > 400){
+   venus2Y = venus2Y+50;
+    venus2X = 0-(seconds%30);
+   }
     //Size Variations Pixel Circle
     //360 VenuS2 - The Model I designed it for 
     //390 Size up
     //416 Size up
     //454 Size up
+    /*
   if (screenHeightY == 390){
    venus2Y = (200*screenHeightY/360);
   }
@@ -918,7 +961,7 @@ function waterPhase(seconds){
       if (screenHeightY == 454){
    venus2Y = (220*screenHeightY/360);
    venus2X = 130*screenWidthX/360;
-  }
+  }*/
   var waterARRAY = [
     (new WatchUi.Bitmap({
             :rezId=>Rez.Drawables.water0,
@@ -1108,24 +1151,25 @@ function getMoonPhase(year, month, day) {
 function moonArrFun(moonnumber){
     var screenHeightY = System.getDeviceSettings().screenHeight;
     var screenWidthX = System.getDeviceSettings().screenWidth;    
-    var venus2Y = 35;
+    var venus2Y = 35*(screenHeightY/360);
     var venus2XL = ((screenWidthX)*119/360);
     //Size Variations Pixel Circle
     //360 VenuS2 - The Model I designed it for 
     //390 Size up
     //416 Size up
     //454 Size up
+    
     if (screenHeightY == 390){
-        venus2XL = ((screenWidthX)*124/360);
-        venus2Y = ((screenHeightY)*135/360);
+        venus2XL = ((venus2XL)+4);
+        venus2Y = ((screenWidthX)*130/360)-100;
     }
     if (screenHeightY == 416){
-        venus2XL = ((screenWidthX)*125/360);
-        venus2Y = ((screenHeightY)*129/360);
+      venus2XL = ((venus2XL)+8);
+        venus2Y = ((screenWidthX)*130/360)-105;
     }
         if (screenHeightY == 454){
-        venus2XL = ((screenWidthX)*132/360);
-        venus2Y = ((screenHeightY)*130/360);
+        venus2XL = ((venus2XL)+15);
+        venus2Y = ((screenWidthX)*130/360)-110;
     }
   var moonArray= [
           (new WatchUi.Bitmap({
