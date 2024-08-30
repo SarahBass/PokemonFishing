@@ -64,18 +64,18 @@ function onUpdate(dc as Dc) as Void {
         hours = hours.format("%02d");
     }
     var timeString = Lang.format(timeFormat, [hours, clockTime.min.format("%02d")]);
-    var timeStamp= new Time.Moment(Time.today().value());
+    //var timeStamp= new Time.Moment(Time.today().value());
     var weekdayArray = ["Day", "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"] as Array<String>;
     var monthArray = ["Month", "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"] as Array<String>;
    
     //----------------Horoscope-------------------//
    
-   // var profile = UserProfile.getProfile();
+    //var profile = UserProfile.getProfile();
    // var userBIRTH = 1989; // Default birth year
 
   //  if (profile != null && profile.birthYear != null) {
   //      userBIRTH = profile.birthYear.toNumber();
-  //  }
+ //   }
     /* Array representing the Chinese horoscope symbols
     r: Monkey
     q: Rooster
@@ -89,9 +89,9 @@ function onUpdate(dc as Dc) as Void {
     o: Snake
     p: Horse
     L: Sheep*/
-    //var chinesehoroscope = ["r", "q", "j", "s", "h", "K", "k", "m", "d", "o", "p", "L"] as Array<String>;
+   // var chinesehoroscope = ["r", "q", "j", "s", "h", "K", "k", "m", "d", "o", "p", "L"] as Array<String>;
     // Current year
-   // var currentYear = today.year.toNumber();
+    //var currentYear = today.year.toNumber();
     //Get Gender
    // var gender = "y"; // Default value if gender is unspecified or null
     /*
@@ -107,6 +107,16 @@ function onUpdate(dc as Dc) as Void {
         //u-female, t-male y-Robot
         
     */
+    /*----------Alarms and Notify------------------------------*/
+    var userNotify = "0";
+    if (mySettings.notificationCount != null) {
+        userNotify = Lang.format("$1$", [mySettings.notificationCount.toNumber().format("%2d")]);
+    }
+
+    var userAlarm = "0";
+    if (mySettings.alarmCount != null) {
+        userAlarm = Lang.format("$1$", [mySettings.alarmCount.toNumber().format("%2d")]);
+    }
 
     /*----------Battery------------------------------*/
     var userBattery = "0";
@@ -126,7 +136,7 @@ function onUpdate(dc as Dc) as Void {
         
     /*----------Steps------------------------------*/
     var userSTEPS = 0;
-  if (info.steps != null){userSTEPS = info.steps.toNumber();}else{userSTEPS=0;} 
+ if (info.steps != null){userSTEPS = info.steps.toNumber();}else{userSTEPS=0;} 
     var userCAL = 0;
     if (info.calories != null){userCAL = info.calories.toNumber();}else{userCAL=0;}  
    
@@ -152,7 +162,7 @@ function onUpdate(dc as Dc) as Void {
     } else {
         cond = 0; // Default to sun condition if unavailable
     }
-
+/*
     var positions;
     if (getCC != null && getCC.observationLocationPosition != null) {
         positions = getCC.observationLocationPosition;
@@ -163,10 +173,12 @@ function onUpdate(dc as Dc) as Void {
             :format => :degrees
         });
     }
+    */
     //Default set to Southern California 
 
     /*----------------Sunrise Sunset-------------------*/
     //Adding Null checks and formating for both the minute and hour
+   /*
     var sunrise = Toybox.Weather.getSunrise(positions, timeStamp);
     var sunriseHour;
     var sunriseMin;
@@ -202,7 +214,7 @@ function onUpdate(dc as Dc) as Void {
         sunsetHour = sunsetHour.format("%02d");
     }
     sunsetMin = sunsetMin.format("%02d");
-
+*/
     var userHEART = "0";
     var heartRate = getHeartRate();
 
@@ -217,6 +229,7 @@ function onUpdate(dc as Dc) as Void {
     var centerX = (dc.getWidth()) / 2;
     var wordFont =  WatchUi.loadResource( Rez.Fonts.smallFont );
     var bigFont= WatchUi.loadResource( Rez.Fonts.bigFont );
+    var funFont= WatchUi.loadResource( Rez.Fonts.funFont );
     View.onUpdate(dc);
 
  /*     _                           _            _    
@@ -225,167 +238,163 @@ function onUpdate(dc as Dc) as Void {
    | (_| | | | (_| |\ V  V /  | (__| | (_) | (__|   < 
     \__,_|_|  \__,_| \_/\_/    \___|_|\___/ \___|_|\_\
                                                    */
-   
-   // dc.setColor(0x415F5F, Graphics.COLOR_TRANSPARENT);        
-    //dc.fillCircle(centerX, centerX, centerX) ;     
-    //dc.setColor(0x3F5E4F, Graphics.COLOR_TRANSPARENT);       
-    //dc.fillCircle(centerX, centerX, centerX*2/3) ;   
-    //dc.setColor(0x4D6A5D, Graphics.COLOR_TRANSPARENT);        
-    //dc.drawCircle(centerX, centerX, centerX) ; 
-    //dc.setColor(0x4D6A5D, Graphics.COLOR_TRANSPARENT);       
-    //dc.drawCircle(centerX, centerX, centerX*1/2) ;   
-    //dc.setColor(0x7B8863, Graphics.COLOR_TRANSPARENT);       
-    //dc.fillCircle(centerX, centerX, centerX*1/2) ;  
-   
-
-    /*----Draw Graphics----------*/
+   //Draw graphics
     var water= waterPhase(today.sec);
     water.draw(dc);
     var dog = dogPhase(today.sec,userSTEPS); //userSTEPS or (today.sec*180) fix 15 and 16 and 17 to be higher
     dog.draw(dc);
-    dc.setColor(0x000000, Graphics.COLOR_TRANSPARENT);       
-     dc.fillRectangle(0,280* screenHeightY , 360,360 );
-    dc.fillRectangle(0,-220* screenHeightY , 360,360 );
-    
-    //dc.setPenWidth(10);
-    // dc.setColor(0x000000, Graphics.COLOR_TRANSPARENT);       
-    dc.drawLine(105,129, 105, (((userSTEPS%360)/3*(-1))+129+100)-today.sec%2);
+
+//PokeBall Vector
+//greyhook
+dc.setPenWidth(5);
+dc.setColor(0x787087, Graphics.COLOR_TRANSPARENT);
+dc.drawArc(115 * screenWidthX, ((((userSTEPS % 360) / 3) * (-1)) + 145 + 150) * screenHeightY - today.sec % 2, 15, Graphics.ARC_COUNTER_CLOCKWISE, 180, 290);
+//White pokeball bottom and fishing line
+dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT);       
+dc.drawLine(105 * screenWidthX, 129 * screenHeightY, 105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2);
+dc.fillCircle(105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2, 20);
+dc.setPenWidth(15);
+//Red Pokeball
+dc.setColor(0xD00F25, Graphics.COLOR_TRANSPARENT);
+dc.drawArc(105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2, 15, Graphics.ARC_COUNTER_CLOCKWISE, 0, 180);
+//Black center
+dc.setColor(0x000000, Graphics.COLOR_TRANSPARENT); 
+dc.fillCircle(105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2, 8); 
+//Fussy middle line that never works on bigger screens
+dc.setPenWidth(5);
+dc.drawLine(84 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2, 127 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY);
+//white center
+dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT); 
+dc.fillCircle(105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2, 4);
+
+
+  //draw pokeball
+//dc.setColor(0x000000, Graphics.COLOR_TRANSPARENT);         
+//dc.drawLine(105 * screenWidthX, 129 * screenHeightY, 105 * screenWidthX, ((((userSTEPS % 360) / 3) * (-1)) + 129 + 150) * screenHeightY - today.sec % 2);
+/*
+dc.setPenWidth(5);
+dc.setColor(0x7B8863, Graphics.COLOR_TRANSPARENT);
+dc.drawArc(115 * screenWidthX, ((((userSTEPS % 360) / 3) * (-1)) + 145 + 150) * screenHeightY - today.sec % 2, 15, Graphics.ARC_COUNTER_CLOCKWISE, 180, 290);
+
+dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT);       
+dc.drawLine(105 * screenWidthX, 129 * screenHeightY, 105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2);
+
+dc.fillCircle(105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2, 20);
+dc.setPenWidth(15);
+dc.setColor(0x7B8863, Graphics.COLOR_TRANSPARENT);
+dc.drawArc(105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2, 15, Graphics.ARC_COUNTER_CLOCKWISE, 0, 180);
+
+dc.setColor(0x000000, Graphics.COLOR_TRANSPARENT); 
+dc.fillCircle(105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2, 8); 
+
+dc.setPenWidth(5);
+dc.drawLine(84 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2, 127 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY);
+
+dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT); 
+dc.fillCircle(105 * screenWidthX, (((userSTEPS % 360) / 3) * (-1) + 129 + 150) * screenHeightY - today.sec % 2, 4);
+*/
+  /*
+    dc.setColor(0x000000, Graphics.COLOR_TRANSPARENT);         
+    dc.drawLine(105,129, 105, (((userSTEPS%360)/3*(-1))+129+150)-today.sec%2);
     dc.setPenWidth(5);
-     dc.setColor(0x7B8863, Graphics.COLOR_TRANSPARENT);
-   dc.drawArc(115, (((userSTEPS%360)/3*(-1))+145+100)-today.sec%2,15,Graphics.ARC_COUNTER_CLOCKWISE, 180, 290);
-    dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT);       
-    dc.drawLine(105,129, 105, ((userSTEPS%360)/3*(-1))+129+100-today.sec%2);
-    dc.fillCircle(105, ((userSTEPS%360)/3*(-1))+129+100-today.sec%2,20);
-   dc.setPenWidth(15);
-   dc.setColor(0x7B8863, Graphics.COLOR_TRANSPARENT);
-   dc.drawArc(105, (((userSTEPS%360)/3*(-1))+129+100-today.sec%2),15,Graphics.ARC_COUNTER_CLOCKWISE, 0, 180);
-    dc.setColor(0x000000, Graphics.COLOR_TRANSPARENT); 
-    dc.fillCircle(105, ((userSTEPS%360)/3*(-1))+129+100-today.sec%2,8); 
-    dc.setPenWidth(5);
-    dc.drawLine(84,((userSTEPS%360)/3*(-1))+129+100-today.sec%2, 127,((userSTEPS%360)/3*(-1))+129+100 );
-   dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT); 
-   dc.fillCircle(105, ((userSTEPS%360)/3*(-1))+129+100-today.sec%2,4);
-   
-   //dc.drawArc(x, y, r, attr, degreeStart, degreeEnd)
-   //ARC_COUNTER_CLOCKWISE	0
     dc.setColor(0x7B8863, Graphics.COLOR_TRANSPARENT);
-    dc.setPenWidth(90);
-    dc.drawCircle(centerX,-127,220);
-     dc.setColor(0x4D6A5D, Graphics.COLOR_TRANSPARENT);       
+    dc.drawArc(115, (((userSTEPS%360)/3*(-1))+145+150)-today.sec%2,15,Graphics.ARC_COUNTER_CLOCKWISE, 180, 290);
+    dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT);       
+    dc.drawLine(105,129, 105, ((userSTEPS%360)/3*(-1))+129+150-today.sec%2);
+    dc.fillCircle(105, ((userSTEPS%360)/3*(-1))+129+150-today.sec%2,20);
+    dc.setPenWidth(15);
+    dc.setColor(0x7B8863, Graphics.COLOR_TRANSPARENT);
+    dc.drawArc(105, (((userSTEPS%360)/3*(-1))+129+150-today.sec%2),15,Graphics.ARC_COUNTER_CLOCKWISE, 0, 180);
+    dc.setColor(0x000000, Graphics.COLOR_TRANSPARENT); 
+    dc.fillCircle(105, ((userSTEPS%360)/3*(-1))+129+150-today.sec%2,8); 
     dc.setPenWidth(5);
-    dc.drawCircle(centerX,-100,240);
-    dc.drawCircle(centerX,-135,180);
-    
-    //dc.fillCircle((360), -200, 360) ;  
-    //dc.fillCircle(0, -200, 360) ;  
-    /*
-    dc.fillRectangle(0,280 , 360,360 );
-    dc.fillRectangle(0,-220 , 360,360 );
-    dc.setColor(0x7B8863, Graphics.COLOR_TRANSPARENT); 
-    dc.fillRectangle(70,38 , 220,100 );
+    dc.drawLine(84,((userSTEPS%360)/3*(-1))+129+150-today.sec%2, 127,((userSTEPS%360)/3*(-1))+129+150 );
+    dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT); 
+    dc.fillCircle(105, ((userSTEPS%360)/3*(-1))+129+150-today.sec%2,4);
+    */
+    //Draw Circle
+    dc.setColor(0x91A174, Graphics.COLOR_TRANSPARENT);
+    if (System.getDeviceSettings().screenHeight >400){
+         dc.fillCircle(centerX,-53*screenHeightY,240*screenHeightY);
+    }else{
+    dc.fillCircle(centerX,-45*screenHeightY,240*screenHeightY);}
+    dc.setColor(0x7B8863, Graphics.COLOR_TRANSPARENT);
+    if (System.getDeviceSettings().screenHeight >360){
+         dc.fillCircle(centerX,-92*screenWidthX,230*screenHeightY);
+    }else{
+    dc.fillCircle(centerX,-92*screenWidthX,240);}
     dc.setColor(0x4D6A5D, Graphics.COLOR_TRANSPARENT);       
     dc.setPenWidth(5);
-    dc.drawRectangle(70,38 , 220,100 );
-*/
-/*
-    dc.setColor(0x2E3731, Graphics.COLOR_TRANSPARENT);   
-    dc.fillCircle(centerX, -40, 200) ;  
-    dc.setColor(0x48574C, Graphics.COLOR_TRANSPARENT);
-    dc.fillCircle(centerX, -50, 200) ;  
-    dc.setColor(0x75887B, Graphics.COLOR_TRANSPARENT);       
-    dc.fillCircle(centerX, -60, 200) ;  
-    dc.setColor(0x849F8C, Graphics.COLOR_TRANSPARENT);    
-    dc.fillCircle(centerX, -150, 200) ;  
-    dc.setColor(0x000000, Graphics.COLOR_TRANSPARENT);    //0x9EADA2   
-    dc.fillCircle(centerX, -160, 200) ; 
-*/
-    //dc.setColor(0xBBCBC0, Graphics.COLOR_TRANSPARENT);       
-    //dc.fillCircle(centerX, -170, 200) ; 
-    //dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT);       
-    //dc.fillCircle(centerX, -180, 200) ; 
-   
-   
+    if (System.getDeviceSettings().screenHeight >400){
+    dc.drawCircle(centerX,-53*screenHeightY,240*screenHeightY);
+    dc.setColor(0x98BD63, Graphics.COLOR_TRANSPARENT);       
+    dc.drawArc(centerX,-53*screenHeightY,240*screenHeightY, Graphics.ARC_COUNTER_CLOCKWISE, 225, 227+(((userSTEPS)%360)/4));
+    } else{
+    dc.drawCircle(centerX,-45*screenHeightY,240*screenHeightY);
+    dc.setColor(0x98BD63, Graphics.COLOR_TRANSPARENT);       
+    dc.drawArc(centerX,-45*screenHeightY,240*screenHeightY, Graphics.ARC_COUNTER_CLOCKWISE, 225, 227+(((userSTEPS)%360)/4));
+    }
+   //Draw Moon and Battery
     moon1.draw(dc);
 
-     
-   
-    /*--------Draw User Data Text---------------------------*/
-    dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT);   
-    // dc.setColor(0x17231B, Graphics.COLOR_TRANSPARENT);  
-  dc.drawText( centerX, screenHeightY, wordFont,  ("+"), Graphics.TEXT_JUSTIFY_CENTER );
-    dc.drawText( centerX, 20*screenHeightY, wordFont,  (userHEART), Graphics.TEXT_JUSTIFY_CENTER );
-   // dc.drawText( 100 *screenWidthX,40*screenHeightY , wordFont,  ("^"), Graphics.TEXT_JUSTIFY_CENTER );
-  // dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT);  
-    dc.drawText( 10 *screenWidthX,110*screenHeightY , wordFont,  ("^"+userSTEPS), Graphics.TEXT_JUSTIFY_LEFT );
-   //5 130 355 130
-   // dc.drawText( 260 *screenWidthX,40*screenHeightY , wordFont,  ("~"), Graphics.TEXT_JUSTIFY_CENTER );
-    dc.drawText( 350*screenWidthX,110*screenHeightY , wordFont,  userCAL+"~", Graphics.TEXT_JUSTIFY_RIGHT );
-    //dc.drawText( 35, 240*screenHeightY, wordFont,  ("+"), Graphics.TEXT_JUSTIFY_CENTER );
-    //dc.drawText( 35, 260*screenHeightY, wordFont,  (userHEART), Graphics.TEXT_JUSTIFY_CENTER );
-   
-/* Draw Weather and Temperature Text
-baegifc Checks Weather Strings 
-a: rain
-e: cloud
-g: wind
-i: snow
-f: whirlwind
-c: suncloudrain*/
-dc.setColor(0x17231B, Graphics.COLOR_TRANSPARENT);  
- dc.drawText( centerX,120*screenHeightY, wordFont, (TEMP+" " +FC), Graphics.TEXT_JUSTIFY_CENTER );
-    dc.drawText( centerX,85*screenHeightY, bigFont, weather(cond), Graphics.TEXT_JUSTIFY_CENTER );
-    //125 - 90
-    //Sunrise
-    //130 165 180  > 35 15
-    dc.drawText( 95 *screenWidthX,34*screenHeightY, bigFont,"l", Graphics.TEXT_JUSTIFY_CENTER );
-    dc.drawText( 95 *screenWidthX,69*screenHeightY , wordFont,  ("SUNRISE"), Graphics.TEXT_JUSTIFY_CENTER);
-    dc.drawText( 95 *screenWidthX,84*screenHeightY, wordFont,(sunriseHour + ":" + sunriseMin+ "AM"), Graphics.TEXT_JUSTIFY_CENTER );
-    //Sunset
-    dc.drawText( 265 *screenWidthX,34*screenHeightY, bigFont,"l", Graphics.TEXT_JUSTIFY_CENTER );
-    dc.drawText( 265 *screenWidthX,69*screenHeightY , wordFont,  ("SUNSET"), Graphics.TEXT_JUSTIFY_CENTER);
-    dc.drawText( 265 *screenWidthX,84*screenHeightY, wordFont,(sunsetHour + ":" + sunsetMin+ "PM"), Graphics.TEXT_JUSTIFY_CENTER );
-    //300 294
-    //Time Text
-    dc.setColor(0xFFFFFF, Graphics.COLOR_TRANSPARENT);
-    dc.drawText(centerX,288*screenHeightY,wordFont,(weekdayArray[today.day_of_week]+" , "+ monthArray[today.month]+" "+ today.day +" " +today.year), Graphics.TEXT_JUSTIFY_CENTER );
-    dc.drawText(centerX,282*screenHeightY,bigFont,timeString,  Graphics.TEXT_JUSTIFY_CENTER  ); 
-   
-    //Bv@wFxCyHzGEIJ B-Capricorn v-Aquarius @-Pisces w-Aries F-Taurus x-Gemini C-Cancer y-r2d2 H- z-DarthVader G-Scorpio E-Sagitarius I-Libra J-Leo
-    // Draw Month Horoscope
-    //dc.drawText(72 *screenWidthX,220*screenHeightY,bigFont, getHoroscope(today.month, today.day),  Graphics.TEXT_JUSTIFY_CENTER  ); 
-    // Drawing the Chinese horoscope based on the current year
-    //rqjshKkmdopL
-    //Monkey, rooster, dog, pig, rat, bull, tiger, rabit, dragon, snake, horse, sheep
-    //dc.drawText(107 *screenWidthX, 256*screenHeightY, bigFont, chinesehoroscope[(currentYear % 12)], Graphics.TEXT_JUSTIFY_CENTER);
-    // Drawing the Chinese horoscope based on the user's birth year
-    //dc.drawText(268 *screenWidthX, 256*screenHeightY, bigFont, chinesehoroscope[(userBIRTH % 12)], Graphics.TEXT_JUSTIFY_CENTER);
-    //dc.drawText(287 *screenWidthX,220*screenHeightY,bigFont, gender,  Graphics.TEXT_JUSTIFY_CENTER  ); 
+    //Draw Top Font
+    dc.setColor(0x17231B, Graphics.COLOR_TRANSPARENT);  
+    dc.drawText( centerX,33*screenHeightY, wordFont, (TEMP+" " +FC), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText( centerX,0*screenHeightY, bigFont, weather(cond), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText(centerX,78*screenHeightY,wordFont,(weekdayArray[today.day_of_week]+" , "+ monthArray[today.month]+" "+ today.day +" " +today.year), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText(centerX,73*screenHeightY,bigFont,timeString,  Graphics.TEXT_JUSTIFY_CENTER  ); 
+    if (System.getDeviceSettings().screenHeight >400){
+        dc.setColor(0x18291E, Graphics.COLOR_TRANSPARENT);
+   // dc.setColor(0x396D4A, Graphics.COLOR_TRANSPARENT);
+    dc.drawText(50 *screenWidthX, 110*screenHeightY-10, funFont,"_" , Graphics.TEXT_JUSTIFY_CENTER);
+    dc.drawText(50*screenWidthX,135*screenHeightY-10,wordFont, userNotify , Graphics.TEXT_JUSTIFY_CENTER  ); 
+    dc.setColor(0x253E2D, Graphics.COLOR_TRANSPARENT);
+    //dc.setColor(0x365D43, Graphics.COLOR_TRANSPARENT);
+    dc.drawText( 105 *screenWidthX,134*screenHeightY -10, funFont,  ("^"), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText( 105 *screenWidthX,162*screenHeightY-10 , wordFont,  userHEART, Graphics.TEXT_JUSTIFY_CENTER );
+    dc.setColor(0x2A4D36, Graphics.COLOR_TRANSPARENT);
+    dc.drawText( centerX, (148)*screenHeightY-10, funFont,  ("$"), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText( centerX, (176)*screenHeightY-10, wordFont,  (userSTEPS), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.setColor(0x253E2D, Graphics.COLOR_TRANSPARENT);
+    dc.drawText( 255*screenWidthX,134*screenHeightY -10, funFont, "!", Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText( 255*screenWidthX,162*screenHeightY-10 , wordFont, userCAL, Graphics.TEXT_JUSTIFY_CENTER );
+    dc.setColor(0x18291E, Graphics.COLOR_TRANSPARENT);
+    dc.drawText(310 *screenWidthX,112*screenHeightY-10,funFont, ">",  Graphics.TEXT_JUSTIFY_CENTER  ); 
+    dc.drawText(310 *screenWidthX,135*screenHeightY-10,wordFont, userAlarm,  Graphics.TEXT_JUSTIFY_CENTER  ); 
+    }else{    
+    //Draw Data Font
+    dc.setColor(0x18291E, Graphics.COLOR_TRANSPARENT);
+   // dc.setColor(0x396D4A, Graphics.COLOR_TRANSPARENT);
+    dc.drawText(50 *screenWidthX, 110*screenHeightY, funFont,"_" , Graphics.TEXT_JUSTIFY_CENTER);
+    dc.drawText(50*screenWidthX,135*screenHeightY,wordFont, userNotify , Graphics.TEXT_JUSTIFY_CENTER  ); 
+    dc.setColor(0x253E2D, Graphics.COLOR_TRANSPARENT);
+    //dc.setColor(0x365D43, Graphics.COLOR_TRANSPARENT);
+    dc.drawText( 105 *screenWidthX,134*screenHeightY , funFont,  ("^"), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText( 105 *screenWidthX,162*screenHeightY , wordFont,  userHEART, Graphics.TEXT_JUSTIFY_CENTER );
+    dc.setColor(0x2A4D36, Graphics.COLOR_TRANSPARENT);
+    dc.drawText( centerX, (148)*screenHeightY, funFont,  ("$"), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText( centerX, (176)*screenHeightY, wordFont,  (userSTEPS), Graphics.TEXT_JUSTIFY_CENTER );
+    dc.setColor(0x253E2D, Graphics.COLOR_TRANSPARENT);
+    dc.drawText( 255*screenWidthX,134*screenHeightY , funFont, "!", Graphics.TEXT_JUSTIFY_CENTER );
+    dc.drawText( 255*screenWidthX,162*screenHeightY , wordFont, userCAL, Graphics.TEXT_JUSTIFY_CENTER );
+    dc.setColor(0x18291E, Graphics.COLOR_TRANSPARENT);
+    dc.drawText(310 *screenWidthX,112*screenHeightY,funFont, ">",  Graphics.TEXT_JUSTIFY_CENTER  ); 
+    dc.drawText(310 *screenWidthX,135*screenHeightY,wordFont, userAlarm,  Graphics.TEXT_JUSTIFY_CENTER  ); 
+    }
 
-
-
-    
-    /*------------Draw Step Meter------------
-    //Every 360 Steps Pikachu Levels up
-    dc.setPenWidth(10);
-    dc.setColor(0x6C7778, Graphics.COLOR_TRANSPARENT);
-    dc.drawCircle(centerX, centerX, screenHeightY);
-    dc.setColor(0x2F4237, Graphics.COLOR_TRANSPARENT);
-    dc.drawArc(centerX, centerX, screenHeightY, Graphics.ARC_COUNTER_CLOCKWISE, 1, (userSTEPS+2) ); 
-*/
-    
     /*---------------Draw Battery---------------*/
     dc.setColor(0x17231B, Graphics.COLOR_TRANSPARENT);  
-    if(batteryMeter<33 &&batteryMeter>9){
-        dc.fillRectangle(centerX*350/360, (centerX*145/360)+10, 9, 50/14);}
-    else if(batteryMeter>33 && batteryMeter<66){
-    dc.fillRectangle(centerX*350/360, (centerX*135/360)+10, 9, 50/14);
-    dc.fillRectangle(centerX*350/360, (centerX*145/360)+10, 9, 50/14);}
-    else if (batteryMeter >66){
-    dc.fillRectangle(centerX*350/360, (centerX*125/360)+10, 9, 50/14);
-    dc.fillRectangle(centerX*350/360, (centerX*135/360)+10, 9, 50/14);
-    dc.fillRectangle(centerX*350/360, (centerX*145/360)+10, 9, 50/14);}
-    else{}
-    
+    if (batteryMeter >= 10 && batteryMeter <= 32) {
+        dc.fillRectangle(centerX * 350 / 360, centerX * 135 / 360, 9, 50 / 14);
+    } else if (batteryMeter >= 33 && batteryMeter <= 65) {
+        dc.fillRectangle(centerX * 350 / 360, centerX * 125 / 360, 9, 50 / 14);
+        dc.fillRectangle(centerX * 350 / 360, centerX * 135 / 360, 9, 50 / 14);
+    } else if (batteryMeter >= 66) {
+        dc.fillRectangle(centerX * 350 / 360, centerX * 115 / 360, 9, 50 / 14);
+        dc.fillRectangle(centerX * 350 / 360, centerX * 125 / 360, 9, 50 / 14);
+        dc.fillRectangle(centerX * 350 / 360, centerX * 135 / 360, 9, 50 / 14);
+    }else{}
+
 }
 /*            _     _ 
   __   _____ (_) __| |
@@ -432,11 +441,14 @@ function dogPhase(seconds, steps){
   else{venus2Y = 200;
   venus2X = screenWidthX - (seconds%20)*40;
   }
+
+  
     //Size Variations Pixel Circle
     //360 VenuS2 - The Model I designed it for 
     //390 Size up
     //416 Size up
     //454 Size up
+   /* 
   if (screenHeightY == 390){
    venus2Y = (200*screenHeightY/360);
   }
@@ -447,7 +459,12 @@ function dogPhase(seconds, steps){
       if (screenHeightY == 454){
    venus2Y = (220*screenHeightY/360);
    venus2X = 130*screenWidthX/360;
-  }
+  }*/
+
+    if (screenHeightY > 400){
+   venus2Y = venus2Y+30;
+   venus2X = venus2X;}
+
   var dogARRAY = [
    (new WatchUi.Bitmap({
     :rezId=>Rez.Drawables.dog0,
@@ -943,15 +960,21 @@ function dogPhase(seconds, steps){
 //DrawOpacityGraphic - dog -
 function waterPhase(seconds){
   var screenHeightY = System.getDeviceSettings().screenHeight;
-  var screenWidthX = System.getDeviceSettings().screenWidth;
+  //var screenWidthX = System.getDeviceSettings().screenWidth;
   var venus2X = 0-(seconds);
  // var venus2Y = 15;
-  var venus2Y = 10;
+  var venus2Y = 110;
+
+      if (screenHeightY > 400){
+   venus2Y = venus2Y+50;
+    venus2X = 0-(seconds%30);
+   }
     //Size Variations Pixel Circle
     //360 VenuS2 - The Model I designed it for 
     //390 Size up
     //416 Size up
     //454 Size up
+    /*
   if (screenHeightY == 390){
    venus2Y = (200*screenHeightY/360);
   }
@@ -962,7 +985,7 @@ function waterPhase(seconds){
       if (screenHeightY == 454){
    venus2Y = (220*screenHeightY/360);
    venus2X = 130*screenWidthX/360;
-  }
+  }*/
   var waterARRAY = [
     (new WatchUi.Bitmap({
             :rezId=>Rez.Drawables.water0,
@@ -1016,73 +1039,73 @@ private function getHeartRate() {
 */
 /*
 function getHoroscope(month, day) {
-    if (month == 0) { // January
+    if (month == 1) { // January
         if (day <= 19) {
             return "B"; // Capricorn
         } else {
             return "v"; // Aquarius
         }
-    } else if (month == 1) { // February
+    } else if (month == 2) { // February
         if (day <= 18) {
             return "v"; // Aquarius
         } else {
             return "@"; // Pisces
         }
-    } else if (month == 2) { // March
+    } else if (month == 3) { // March
         if (day <= 20) {
             return "@"; // Pisces
         } else {
             return "w"; // Aries
         }
-    } else if (month == 3) { // April
+    } else if (month == 4) { // April
         if (day <= 19) {
             return "w"; // Aries
         } else {
             return "F"; // Taurus
         }
-    } else if (month == 4) { // May
+    } else if (month == 5) { // May
         if (day <= 20) {
             return "F"; // Taurus
         } else {
             return "x"; // Gemini
         }
-    } else if (month == 5) { // June
+    } else if (month == 6) { // June
         if (day <= 20) {
             return "x"; // Gemini
         } else {
             return "C"; // Cancer
         }
-    } else if (month == 6) { // July
+    } else if (month == 7) { // July
         if (day <= 22) {
             return "C"; // Cancer
         } else {
             return "J"; // Leo
         }
-    } else if (month == 7) { // August
+    } else if (month == 8) { // August
         if (day <= 22) {
             return "J"; // Leo
         } else {
             return "H"; // Virgo
         }
-    } else if (month == 8) { // September
+    } else if (month == 9) { // September
         if (day <= 22) {
             return "H"; // Virgo
         } else {
             return "I"; // Libra
         }
-    } else if (month == 9) { // October
+    } else if (month == 10) { // October
         if (day <= 22) {
             return "I"; // Libra
         } else {
             return "G"; // Scorpio
         }
-    } else if (month == 10) { // November
+    } else if (month == 11) { // November
         if (day <= 21) {
             return "G"; // Scorpio
         } else {
             return "E"; // Sagittarius
         }
-    } else if (month == 11) { // December
+    } else if (month == 12) { // December
         if (day <= 21) {
             return "E"; // Sagittarius
         } else {
@@ -1092,7 +1115,8 @@ function getHoroscope(month, day) {
         return "w"; // Default to Aries if month is invalid
     }
 }
-  */         
+
+     */  
 
 
 
@@ -1151,24 +1175,25 @@ function getMoonPhase(year, month, day) {
 function moonArrFun(moonnumber){
     var screenHeightY = System.getDeviceSettings().screenHeight;
     var screenWidthX = System.getDeviceSettings().screenWidth;    
-    var venus2Y = ((screenHeightY)*50/360);
+    var venus2Y = 35*(screenHeightY/360);
     var venus2XL = ((screenWidthX)*119/360);
     //Size Variations Pixel Circle
     //360 VenuS2 - The Model I designed it for 
     //390 Size up
     //416 Size up
     //454 Size up
+    
     if (screenHeightY == 390){
-        venus2XL = ((screenWidthX)*124/360);
-        venus2Y = ((screenHeightY)*135/360);
+        venus2XL = ((venus2XL)+4);
+        venus2Y = ((screenWidthX)*130/360)-100;
     }
     if (screenHeightY == 416){
-        venus2XL = ((screenWidthX)*125/360);
-        venus2Y = ((screenHeightY)*129/360);
+      venus2XL = ((venus2XL)+8);
+        venus2Y = ((screenWidthX)*130/360)-105;
     }
         if (screenHeightY == 454){
-        venus2XL = ((screenWidthX)*132/360);
-        venus2Y = ((screenHeightY)*130/360);
+        venus2XL = ((venus2XL)+15);
+        venus2Y = ((screenWidthX)*130/360)-110;
     }
   var moonArray= [
           (new WatchUi.Bitmap({
